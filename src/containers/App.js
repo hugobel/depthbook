@@ -1,11 +1,9 @@
 import React from 'react';
-import uuid from 'uuid/v4';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import api from '../services/api';
-import './App.css';
+import Table from '../components/Table';
 
-const items = i => (
-  <p key={uuid()}>{ `${i.price} - ${i.amount}` }</p>
-);
+import './App.css';
 
 class App extends React.Component {
   constructor(props) {
@@ -30,15 +28,8 @@ class App extends React.Component {
 
     return (
       <div>
-        Orders go here
-        <div>
-          {asks && asks.map(items)}
-          <h3>Asks</h3>
-        </div>
-        <div>
-          <h3>Bids</h3>
-          {bids && bids.map(items)}
-        </div>
+        <Table label="Posturas de compra" orders={bids} />
+        <Table label="Posturas de venta" orders={asks} />
       </div>
     );
   }
