@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
+import numeral from 'numeral';
 
 const TableDefinitions = () => (
   <thead>
@@ -16,10 +16,10 @@ const TableDefinitions = () => (
 
 const TableRow = order => (
   <tr>
-    <td>${ order.price }</td>
+    <td>{ numeral(order.price).format('$0,0.00') }</td>
     <td>{ order.amount }</td>
     <td className="text-right">
-      ${ _.round(order.price * order.amount, 2).toFixed(2) }
+      { numeral(order.price * order.amount).format('$0,0.00') }
     </td>
   </tr>
 );

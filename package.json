@@ -6,6 +6,7 @@
     "axios": "^0.18.0",
     "bootstrap": "^4.0.0",
     "lodash": "^4.17.5",
+    "numeral": "^2.0.6",
     "prop-types": "^15.6.1",
     "react": "^16.3.0",
     "react-dom": "^16.3.0",
