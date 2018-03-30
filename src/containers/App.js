@@ -27,9 +27,14 @@ class App extends React.Component {
     const { asks, bids } = this.state;
 
     return (
-      <div>
-        <Table label="Posturas de compra" orders={bids} />
-        <Table label="Posturas de venta" orders={asks} />
+      <div className="container">
+        <section className="row justify-content-center mt-5 mb-5">
+          <img src="http://via.placeholder.com/640x360" alt="Chart" />
+        </section>
+        <div className="row justify-content-around">
+          <Table label="Posturas de compra" orders={bids} />
+          <Table label="Posturas de venta" orders={asks} />
+        </div>
       </div>
     );
   }
