@@ -2,6 +2,7 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import api from '../services/api';
 import Table from '../components/Table';
+import Chart from '../components/Chart';
 
 import './App.css';
 
@@ -29,7 +30,7 @@ class App extends React.Component {
     return (
       <div className="container">
         <section className="row justify-content-center mt-5 mb-5">
-          <img src="http://via.placeholder.com/640x360" alt="Chart" />
+          <Chart />
         </section>
         <div className="row justify-content-around">
           <Table label="Posturas de compra" orders={bids} />
