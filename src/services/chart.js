@@ -9,6 +9,13 @@ class Chart {
 
     this.margin = 40;
 
+    this.midpoint = (Number(this.orders.asks[0].price) + Number(this.orders.bids[0].price)) / 2;
+
+    const leftLimit = this.midpoint - Number(_.last(this.orders.bids).price);
+    const rightLimit = Number(_.last(this.orders.asks).price) - this.midpoint;
+
+    this.diffLimit = Math.max(leftLimit, rightLimit);
+
     this.drawScene();
     this.setScales();
     this.drawAxes();
@@ -25,16 +32,14 @@ class Chart {
   }
 
   setScales() {
-    const { asks, bids } = this.orders;
-
     this.xScale = d3
       .scaleLinear()
-      .domain([_.last(bids).price, _.last(asks).price])
+      .domain([this.midpoint - this.diffLimit, this.midpoint + this.diffLimit])
       .range([this.margin + 1, 960 - this.margin]);
 
     this.yScale = d3
       .scaleLinear()
-      .domain([0, _.last(this.cumulative.bids)])
+      .domain([0, _.last(this.cumulative.asks)])
       .range([420, 0]);
   }
 

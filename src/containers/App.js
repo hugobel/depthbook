@@ -17,7 +17,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const getOrders = api.getOrderBook('eth_mxn');
+    const getOrders = api.getOrderBook('btc_mxn');
 
     getOrders
       .then(response => response.data.payload)
