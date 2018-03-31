@@ -9,15 +9,10 @@ class Chart {
 
     this.margin = 40;
 
-    this.midpoint = (Number(this.orders.asks[0].price) + Number(this.orders.bids[0].price)) / 2;
-
-    const leftLimit = this.midpoint - Number(_.last(this.orders.bids).price);
-    const rightLimit = Number(_.last(this.orders.asks).price) - this.midpoint;
-
-    this.diffLimit = Math.max(leftLimit, rightLimit);
-
     this.drawScene();
+    this.setLimits();
     this.setScales();
+    this.setVisualLimit();
     this.drawAxes();
     this.drawOrdersArea('asks');
     this.drawOrdersArea('bids');
@@ -31,15 +26,42 @@ class Chart {
     return this.scene;
   }
 
+  setLimits() {
+    const lowestPrice = Number(_.last(this.orders.bids).price);
+    const highestPrice = Number(_.last(this.orders.asks).price);
+
+    this.midpoint = (Number(this.orders.asks[0].price) + Number(this.orders.bids[0].price)) / 2;
+
+    const midpointDiff = Math.max((this.midpoint - lowestPrice), (highestPrice - this.midpoint));
+    const topValue = Math.max(_.last(this.cumulative.asks), _.last(this.cumulative.bids));
+
+    this.limits = {
+      left: this.midpoint - midpointDiff,
+      right: this.midpoint + midpointDiff,
+      top: topValue * 1.1, // Adds 10% to the end of the chart
+    };
+  }
+
+  setVisualLimit() {
+    const asksHighest = { price: this.limits.right };
+    const bidsLowest = { price: this.limits.left };
+
+    this.cumulative.asks.push(_.last(this.cumulative.asks));
+    this.cumulative.bids.push(_.last(this.cumulative.bids));
+
+    this.asks = [...this.orders.asks, asksHighest];
+    this.bids = [...this.orders.bids, bidsLowest];
+  }
+
   setScales() {
     this.xScale = d3
       .scaleLinear()
-      .domain([this.midpoint - this.diffLimit, this.midpoint + this.diffLimit])
+      .domain([this.limits.left, this.limits.right])
       .range([this.margin + 1, 960 - this.margin]);
 
     this.yScale = d3
       .scaleLinear()
-      .domain([0, _.last(this.cumulative.asks)])
+      .domain([0, this.limits.top])
       .range([420, 0]);
   }
 
@@ -52,8 +74,8 @@ class Chart {
   }
 
   drawAxes() {
-    const leftAxis = d3.axisLeft(this.yScale).ticks(5);
-    const rightAxis = d3.axisRight(this.yScale).ticks(5);
+    const leftAxis = d3.axisLeft(this.yScale).ticks(5, 's');
+    const rightAxis = d3.axisRight(this.yScale).ticks(5, 's');
 
     this.scene
       .append('g')
@@ -75,7 +97,7 @@ class Chart {
 
     this.scene
       .append('path')
-      .datum(this.orders[type])
+      .datum(this[type])
       .attr('fill', 'orange')
       .attr('d', area)
       .attr('transform', `translate(0, ${this.margin})`);
