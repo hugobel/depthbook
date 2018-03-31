@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import numeral from 'numeral';
+import uuid from 'uuid/v4';
 
 const TableDefinitions = () => (
   <thead>
@@ -15,7 +16,7 @@ const TableDefinitions = () => (
 );
 
 const TableRow = order => (
-  <tr>
+  <tr key={uuid()}>
     <td>{ numeral(order.price).format('$0,0.00') }</td>
     <td>{ order.amount }</td>
     <td className="text-right">

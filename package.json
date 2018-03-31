@@ -5,7 +5,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bootstrap": "^4.0.0",
-    "d3": "^5.0.0",
+    "d3": "4",
     "lodash": "^4.17.5",
     "numeral": "^2.0.6",
     "prop-types": "^15.6.1",
