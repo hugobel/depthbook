@@ -6,8 +6,7 @@ class Chart {
     this.container = options.container;
     this.orders = options.orders;
 
-    this.margin = 40;
-
+    this.setDimensions();
     this.drawScene();
     this.setLimits();
     this.setScales();
@@ -25,6 +24,20 @@ class Chart {
     return this.scene;
   }
 
+  setDimensions() {
+    this.dimensions = {
+      width: 980,
+      height: 520,
+    };
+
+    this.margins = {
+      top: 40,
+      right: 60,
+      bottom: 50,
+      left: 60,
+    };
+  }
+
   setLimits() {
     const lowestPrice = Number(_.last(this.orders.bids).price);
     const highestPrice = Number(_.last(this.orders.asks).price);
@@ -37,7 +50,7 @@ class Chart {
     this.limits = {
       left: this.midpoint - midpointDiff,
       right: this.midpoint + midpointDiff,
-      top: topValue * 1.1, // Adds 10% to the end of the chart
+      top: topValue * 1.1,
     };
   }
 
@@ -70,20 +83,21 @@ class Chart {
     this.xScale = d3
       .scaleLinear()
       .domain([this.limits.left, this.limits.right])
-      .range([this.margin + 1, 960 - this.margin]);
+      .range([this.margins.left + 1, this.dimensions.width - this.margins.right]);
 
     this.yScale = d3
       .scaleLinear()
       .domain([0, this.limits.top])
-      .range([420, 0]);
+      .range([this.dimensions.height - this.margins.top - this.margins.bottom, 0]);
   }
 
   drawScene() {
     this.scene = d3
       .select(this.container)
       .append('svg')
-      .attr('width', 960)
-      .attr('height', 540);
+      .attr('width', this.dimensions.width)
+      .attr('height', this.dimensions.height)
+      .attr('class', 'chart');
   }
 
   drawAxes() {
@@ -93,17 +107,17 @@ class Chart {
 
     this.scene
       .append('g')
-      .attr('transform', `translate(${this.margin}, ${this.margin})`)
+      .attr('transform', `translate(${this.margins.left}, ${this.margins.top})`)
       .call(leftAxis);
 
     this.scene
       .append('g')
-      .attr('transform', `translate(${960 - this.margin}, ${this.margin})`)
+      .attr('transform', `translate(${this.dimensions.width - this.margins.right}, ${this.margins.top})`)
       .call(rightAxis);
 
     this.scene
       .append('g')
-      .attr('transform', 'translate(0, 460)')
+      .attr('transform', `translate(0, ${this.dimensions.height - this.margins.bottom})`)
       .call(bottomAxis);
   }
 
@@ -123,16 +137,16 @@ class Chart {
     this.scene
       .append('path')
       .datum(this[type])
-      .attr('class', 'area')
+      .attr('class', `chart-area chart-area--${type}`)
       .attr('d', area)
-      .attr('transform', `translate(0, ${this.margin})`);
+      .attr('transform', `translate(0, ${this.margins.top})`);
 
     this.scene
       .append('path')
       .datum(this[type])
-      .attr('class', 'line')
+      .attr('class', `chart-line chart-line--${type}`)
       .attr('d', line)
-      .attr('transform', `translate(0, ${this.margin})`);
+      .attr('transform', `translate(0, ${this.margins.top})`);
   }
 }
 

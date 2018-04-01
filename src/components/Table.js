@@ -20,7 +20,9 @@ const TableDefinitions = () => (
 
 const TableRow = order => (
   <tr key={uuid()}>
-    <td>{ numeral(order.price).format('$0,0.00') }</td>
+    <td>
+      { numeral(order.price).format('$0,0.00') }
+    </td>
     <td>{ order.amount }</td>
     <td className="text-right">
       { numeral(order.price * order.amount).format('$0,0.00') }
@@ -34,7 +36,7 @@ const TableRow = order => (
 const Table = ({ label, orders }) => (
   <section className="col-5">
     <table className="table table-sm">
-      <thead className="table-info">
+      <thead>
         <tr><th colSpan="4">{ label }</th></tr>
       </thead>
       <TableDefinitions />

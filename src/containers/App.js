@@ -1,11 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import api from '../services/api';
 import collection from '../utils/collection';
 import Table from '../components/Table';
 import DepthChart from '../components/DepthChart';
-
-import './App.css';
 
 class App extends React.Component {
   constructor(props) {
@@ -14,11 +13,12 @@ class App extends React.Component {
     this.state = {
       asks: [],
       bids: [],
+      book: props.book,
     };
   }
 
   componentDidMount() {
-    const getOrders = api.getOrderBook('xrp_mxn');
+    const getOrders = api.getOrderBook(this.state.book);
 
     getOrders
       .then(response => response.data.payload)
@@ -27,6 +27,26 @@ class App extends React.Component {
         bids: collection.appendCumulative(data.bids),
       }))
       .then(data => this.setState({ ...data }));
+
+    setTimeout(() => {
+      this.setState({ book: 'btc_mxn' });
+    }, 10000);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.book === prevState.book) return null;
+
+    const getOrders = api.getOrderBook(this.state.book);
+
+    getOrders
+      .then(response => response.data.payload)
+      .then(data => ({
+        asks: collection.appendCumulative(data.asks),
+        bids: collection.appendCumulative(data.bids),
+      }))
+      .then(data => this.setState({ ...data }));
+
+    return null;
   }
 
   render() {
@@ -45,5 +65,13 @@ class App extends React.Component {
     );
   }
 }
+
+App.defaultProps = {
+  book: 'btc_mxn',
+};
+
+App.propTypes = {
+  book: PropTypes.string,
+};
 
 export default App;
