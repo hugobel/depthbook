@@ -5,14 +5,13 @@ class Chart {
   constructor(options) {
     this.container = options.container;
     this.orders = options.orders;
-    this.cumulative = options.cumulative;
 
     this.margin = 40;
 
     this.drawScene();
     this.setLimits();
     this.setScales();
-    this.setVisualLimit();
+    // this.setGraphicLimit();
     this.drawAxes();
     this.drawOrdersArea('asks');
     this.drawOrdersArea('bids');
@@ -27,13 +26,18 @@ class Chart {
   }
 
   setLimits() {
-    const lowestPrice = Number(_.last(this.orders.bids).price);
-    const highestPrice = Number(_.last(this.orders.asks).price);
+    const lowestPrice = Number(_.last(Object.keys(this.orders.bids)));
+    const highestPrice = Number(_.last(Object.keys(this.orders.asks)));
 
-    this.midpoint = (Number(this.orders.asks[0].price) + Number(this.orders.bids[0].price)) / 2;
+    this.midpoint = (
+      Number(Object.keys(this.orders.asks)[0]) + Number(Object.keys(this.orders.asks)[0])
+    ) / 2;
 
     const midpointDiff = Math.max((this.midpoint - lowestPrice), (highestPrice - this.midpoint));
-    const topValue = Math.max(_.last(this.cumulative.asks), _.last(this.cumulative.bids));
+    const topValue = Math.max(
+      _.last(Object.values(this.orders.asks)),
+      _.last(Object.values(this.orders.bids)),
+    );
 
     this.limits = {
       left: this.midpoint - midpointDiff,
@@ -42,16 +46,18 @@ class Chart {
     };
   }
 
-  setVisualLimit() {
-    const asksHighest = { price: this.limits.right };
-    const bidsLowest = { price: this.limits.left };
-
-    this.cumulative.asks.push(_.last(this.cumulative.asks));
-    this.cumulative.bids.push(_.last(this.cumulative.bids));
-
-    this.asks = [...this.orders.asks, asksHighest];
-    this.bids = [...this.orders.bids, bidsLowest];
-  }
+  // setGraphicLimit() {
+  //   const asksHighest = {
+  //     [this.limits.right]: _.last(Object.values(this.orders.asks)),
+  //   };
+  //
+  //   const bidsLowest = {
+  //     [this.limits.left]: _.last(Object.values(this.orders.bids)),
+  //   };
+  //
+  //   this.asks = { ...this.orders.asks, ...asksHighest };
+  //   this.bids = { ...this.orders.bids, ...bidsLowest };
+  // }
 
   setScales() {
     this.xScale = d3
@@ -91,13 +97,18 @@ class Chart {
   drawOrdersArea(type) {
     const area = d3.area()
       .x(d => this.xScale(d.price))
-      .y1((d, i) => this.yScale(this.cumulative[type][i]));
+      .y1(d => this.yScale(d.sum));
 
     area.y0(this.yScale(0)).curve(d3.curveStepAfter);
 
+    const entries = Object.entries(this.orders[type]).map(([key, value]) => ({
+      price: key,
+      sum: value,
+    }));
+
     this.scene
       .append('path')
-      .datum(this[type])
+      .datum(entries)
       .attr('fill', 'orange')
       .attr('d', area)
       .attr('transform', `translate(0, ${this.margin})`);

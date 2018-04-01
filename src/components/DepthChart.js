@@ -1,18 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import { withFauxDOM } from 'react-faux-dom';
 import Chart from '../services/chart';
 
 import './DepthChart.css';
 
-const aggregate = orders => (
-  orders.reduce((acc, item, i) => {
-    acc[i] = Number(item.amount) + (i > 0 ? acc[i - 1] : 0);
-    return acc;
-  }, [])
-);
-
-const hasOrders = o => o.asks.length || o.bids.length;
+const hasOrders = o => !_.isEmpty(o.asks) || !_.isEmpty(o.bids);
 
 class DepthChart extends React.Component {
   render() {
@@ -21,18 +15,7 @@ class DepthChart extends React.Component {
 
     if (!hasOrders(orders)) return 'Loading';
 
-    const cumulative = {
-      asks: aggregate(orders.asks),
-      bids: aggregate(orders.bids),
-    };
-
-    const options = {
-      container,
-      orders,
-      cumulative,
-    };
-
-    const chart = new Chart(options);
+    const chart = new Chart({ container, orders });
 
     return chart.canvas.node().toReact();
   }
@@ -45,8 +28,8 @@ DepthChart.defaultProps = {
 
 DepthChart.propTypes = {
   orders: PropTypes.shape({
-    asks: PropTypes.array,
-    bids: PropTypes.array,
+    asks: PropTypes.object,
+    bids: PropTypes.object,
   }),
   connectFauxDOM: PropTypes.func,
 };

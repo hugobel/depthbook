@@ -5,7 +5,7 @@ const api = {
 
   getOrderBook: (book) => {
     const url = config.API_BASE + config.ORDERBOOK_PATH;
-    return axios.get(url, { params: { book } });
+    return axios.get(url, { params: { book, aggregate: 'false' } });
   },
 
 };
