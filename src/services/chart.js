@@ -12,9 +12,9 @@ class Chart {
     this.setLimits();
     this.setScales();
     this.setGraphicLimit();
-    this.drawAxes();
     this.drawOrdersArea('asks');
     this.drawOrdersArea('bids');
+    this.drawAxes();
   }
 
   get canvas() {
@@ -42,9 +42,19 @@ class Chart {
   }
 
   setGraphicLimit() {
+    const asksBase = {
+      price: this.orders.asks[0].price,
+      sum: 0,
+    };
+
     const asksHighest = {
       price: this.limits.right,
       sum: _.last(this.orders.asks).sum,
+    };
+
+    const bidsBase = {
+      price: this.orders.bids[0].price,
+      sum: 0,
     };
 
     const bidsLowest = {
@@ -52,8 +62,8 @@ class Chart {
       sum: _.last(this.orders.bids).sum,
     };
 
-    this.asks = [...this.orders.asks, asksHighest];
-    this.bids = [...this.orders.bids, bidsLowest];
+    this.asks = [asksBase, ...this.orders.asks, asksHighest];
+    this.bids = [bidsBase, ...this.orders.bids, bidsLowest];
   }
 
   setScales() {
@@ -77,8 +87,9 @@ class Chart {
   }
 
   drawAxes() {
-    const leftAxis = d3.axisLeft(this.yScale).ticks(5, 's');
-    const rightAxis = d3.axisRight(this.yScale).ticks(5, 's');
+    const leftAxis = d3.axisLeft(this.yScale).ticks(5, 's').tickSizeOuter(0);
+    const rightAxis = d3.axisRight(this.yScale).ticks(5, 's').tickSizeOuter(0);
+    const bottomAxis = d3.axisBottom(this.xScale).ticks(10, 's').tickSizeOuter(0);
 
     this.scene
       .append('g')
@@ -89,20 +100,38 @@ class Chart {
       .append('g')
       .attr('transform', `translate(${960 - this.margin}, ${this.margin})`)
       .call(rightAxis);
+
+    this.scene
+      .append('g')
+      .attr('transform', 'translate(0, 460)')
+      .call(bottomAxis);
   }
 
   drawOrdersArea(type) {
     const area = d3.area()
       .x(d => this.xScale(d.price))
-      .y1(d => this.yScale(d.sum));
+      .y1(d => this.yScale(d.sum))
+      .y0(this.yScale(0))
+      .curve(d3.curveStepAfter);
 
-    area.y0(this.yScale(0)).curve(d3.curveStepAfter);
+    const line = d3.line()
+      .x(d => this.xScale(d.price))
+      .y(d => this.yScale(d.sum))
+      .curve(d3.curveStepAfter);
+
 
     this.scene
       .append('path')
       .datum(this[type])
-      .attr('fill', 'orange')
+      .attr('class', 'area')
       .attr('d', area)
+      .attr('transform', `translate(0, ${this.margin})`);
+
+    this.scene
+      .append('path')
+      .datum(this[type])
+      .attr('class', 'line')
+      .attr('d', line)
       .attr('transform', `translate(0, ${this.margin})`);
   }
 }

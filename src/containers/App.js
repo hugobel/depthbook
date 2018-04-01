@@ -18,7 +18,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const getOrders = api.getOrderBook('btc_mxn');
+    const getOrders = api.getOrderBook('xrp_mxn');
 
     getOrders
       .then(response => response.data.payload)
@@ -37,7 +37,7 @@ class App extends React.Component {
         <section className="row justify-content-center mt-5 mb-5">
           <DepthChart orders={{ asks, bids }} />
         </section>
-        <div className="row justify-content-around">
+        <div className="row justify-content-around small">
           <Table label="Posturas de compra" orders={bids} />
           <Table label="Posturas de venta" orders={asks} />
         </div>
