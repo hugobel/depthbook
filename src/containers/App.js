@@ -1,6 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import api from '../services/api';
+import collection from '../utils/collection';
 import Table from '../components/Table';
 import DepthChart from '../components/DepthChart';
 
@@ -17,10 +18,14 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const getOrders = api.getOrderBook('xrp_mxn');
+    const getOrders = api.getOrderBook('btc_mxn');
 
     getOrders
       .then(response => response.data.payload)
+      .then(data => ({
+        asks: collection.appendCumulative(data.asks),
+        bids: collection.appendCumulative(data.bids),
+      }))
       .then(data => this.setState({ ...data }));
   }
 

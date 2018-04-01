@@ -11,6 +11,9 @@ const TableDefinitions = () => (
       <th scope="col" className="text-right">
         Valor
       </th>
+      <th scope="col" className="text-right">
+        Suma
+      </th>
     </tr>
   </thead>
 );
@@ -22,6 +25,9 @@ const TableRow = order => (
     <td className="text-right">
       { numeral(order.price * order.amount).format('$0,0.00') }
     </td>
+    <td className="text-right">
+      { numeral(order.sum).format('0,0.00') }
+    </td>
   </tr>
 );
 
@@ -29,7 +35,7 @@ const Table = ({ label, orders }) => (
   <section className="col-5">
     <table className="table table-sm">
       <thead className="table-info">
-        <tr><th colSpan="3">{ label }</th></tr>
+        <tr><th colSpan="4">{ label }</th></tr>
       </thead>
       <TableDefinitions />
       <tbody>
