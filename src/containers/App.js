@@ -6,6 +6,8 @@ import collection from '../utils/collection';
 import Table from '../components/Table';
 import DepthChart from '../components/DepthChart';
 
+const hasOrders = o => o.asks.length || o.bids.length;
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -13,40 +15,46 @@ class App extends React.Component {
     this.state = {
       asks: [],
       bids: [],
-      book: props.book,
+      book: '',
+      query: this.props.book,
     };
+
+    this.requestBook = this.requestBook.bind(this);
   }
 
   componentDidMount() {
-    const getOrders = api.getOrderBook(this.state.book);
-
-    getOrders
-      .then(response => response.data.payload)
-      .then(data => ({
-        asks: collection.appendCumulative(data.asks),
-        bids: collection.appendCumulative(data.bids),
-      }))
-      .then(data => this.setState({ ...data }));
+    this.requestBook(this.props.book);
 
     setTimeout(() => {
-      this.setState({ book: 'btc_mxn' });
+      this.setState({ query: 'btc_mxn' });
+    }, 5000);
+
+    setTimeout(() => {
+      this.setState({ query: 'eth_mxn' });
     }, 10000);
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.book === prevState.book) return null;
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.state.book !== nextState.book || nextState.query;
+  }
 
-    const getOrders = api.getOrderBook(this.state.book);
+  componentDidUpdate() {
+    if (this.state.query) this.requestBook(this.state.query);
+  }
 
-    getOrders
+  requestBook(book) {
+    api
+      .getOrderBook(book)
       .then(response => response.data.payload)
       .then(data => ({
         asks: collection.appendCumulative(data.asks),
         bids: collection.appendCumulative(data.bids),
       }))
-      .then(data => this.setState({ ...data }));
-
-    return null;
+      .then(data => this.setState({
+        book,
+        ...data,
+        query: null,
+      }));
   }
 
   render() {
@@ -55,7 +63,7 @@ class App extends React.Component {
     return (
       <div className="container">
         <section className="row justify-content-center mt-5 mb-5">
-          <DepthChart orders={{ asks, bids }} />
+          { hasOrders({ asks, bids }) && <DepthChart orders={{ asks, bids }} /> }
         </section>
         <div className="row justify-content-around small">
           <Table label="Posturas de compra" orders={bids} />

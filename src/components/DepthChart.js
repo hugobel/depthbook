@@ -3,18 +3,27 @@ import PropTypes from 'prop-types';
 import { withFauxDOM } from 'react-faux-dom';
 import Chart from '../services/chart';
 
-const hasOrders = o => o.asks.length || o.bids.length;
-
 class DepthChart extends React.Component {
+  constructor(props) {
+    super(props);
+    const target = props.connectFauxDOM('div');
+
+    this.state = {
+      chart: new Chart(target),
+      orders: props.orders,
+    };
+  }
+
+  shouldComponentUpdate(nextProps) {
+    this.state.chart.update(nextProps.orders);
+    return false;
+  }
+
   render() {
-    const { orders } = this.props;
-    const container = this.props.connectFauxDOM('div');
+    const { chart, orders } = this.state;
+    chart.draw(orders);
 
-    if (!hasOrders(orders)) return 'Loading';
-
-    const chart = new Chart({ container, orders });
-
-    return chart.canvas.node().toReact();
+    return this.state.chart.canvas.node().toReact();
   }
 }
 
