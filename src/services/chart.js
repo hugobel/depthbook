@@ -49,13 +49,13 @@ class Chart {
   }
 
   setLimits() {
-    const lowestPrice = Number(_.last(this.orders.bids).price);
-    const highestPrice = Number(_.last(this.orders.asks).price);
+    const lowestPrice = Number(_.last(this.orders.bids)[0]);
+    const highestPrice = Number(_.last(this.orders.asks)[0]);
 
-    this.midpoint = (Number(this.orders.asks[0].price) + Number(this.orders.bids[0].price)) / 2;
+    this.midpoint = (Number(this.orders.asks[0][0]) + Number(this.orders.bids[0][0])) / 2;
 
     const midpointDiff = Math.max((this.midpoint - lowestPrice), (highestPrice - this.midpoint));
-    const topValue = Math.max(_.last(this.orders.asks).sum, _.last(this.orders.bids).sum);
+    const topValue = Math.max(_.last(this.orders.asks)[2], _.last(this.orders.bids)[2]);
 
     this.limits = {
       left: this.midpoint - midpointDiff,
@@ -65,25 +65,29 @@ class Chart {
   }
 
   setGraphicLimit() {
-    const asksBase = {
-      price: this.orders.asks[0].price,
-      sum: 0,
-    };
+    const asksBase = [
+      this.orders.asks[0][0],
+      null,
+      0,
+    ];
 
-    const asksHighest = {
-      price: this.limits.right,
-      sum: _.last(this.orders.asks).sum,
-    };
+    const asksHighest = [
+      this.limits.right,
+      null,
+      _.last(this.orders.asks)[2],
+    ];
 
-    const bidsBase = {
-      price: this.orders.bids[0].price,
-      sum: 0,
-    };
+    const bidsBase = [
+      this.orders.bids[0][0],
+      null,
+      0,
+    ];
 
-    const bidsLowest = {
-      price: this.limits.left,
-      sum: _.last(this.orders.bids).sum,
-    };
+    const bidsLowest = [
+      this.limits.left,
+      null,
+      _.last(this.orders.bids)[2],
+    ];
 
     this.asks = [asksBase, ...this.orders.asks, asksHighest];
     this.bids = [bidsBase, ...this.orders.bids, bidsLowest];
@@ -112,14 +116,14 @@ class Chart {
 
   defineShapes() {
     const area = d3.area()
-      .x(d => this.xScale(d.price))
-      .y1(d => this.yScale(d.sum))
+      .x(d => this.xScale(d[0]))
+      .y1(d => this.yScale(d[2]))
       .y0(this.yScale(0))
       .curve(d3.curveStepAfter);
 
     const line = d3.line()
-      .x(d => this.xScale(d.price))
-      .y(d => this.yScale(d.sum))
+      .x(d => this.xScale(d[0]))
+      .y(d => this.yScale(d[2]))
       .curve(d3.curveStepAfter);
 
     this.shapes = { area, line };

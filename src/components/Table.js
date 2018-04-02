@@ -21,14 +21,14 @@ const TableDefinitions = () => (
 const TableRow = order => (
   <tr key={uuid()}>
     <td>
-      { numeral(order.price).format('$0,0.00') }
+      { numeral(order[0]).format('$0,0.00') }
     </td>
-    <td>{ order.amount }</td>
+    <td>{ order[1] }</td>
     <td className="text-right">
-      { numeral(order.price * order.amount).format('$0,0.00') }
+      { numeral(order[0] * order[1]).format('$0,0.00') }
     </td>
     <td className="text-right">
-      { numeral(order.sum).format('0,0.00') }
+      { numeral(order[2]).format('0,0.00') }
     </td>
   </tr>
 );
@@ -51,7 +51,7 @@ const Table = ({ label, orders, type }) => (
 
 Table.propTypes = {
   label: PropTypes.string.isRequired,
-  orders: PropTypes.arrayOf(PropTypes.object),
+  orders: PropTypes.arrayOf(PropTypes.array),
   type: PropTypes.string,
 };
 

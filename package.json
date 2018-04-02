@@ -9,6 +9,7 @@
     "lodash": "^4.17.5",
     "numeral": "^2.0.6",
     "prop-types": "^15.6.1",
+    "pusher-js": "^4.2.2",
     "react": "^16.3.0",
     "react-dom": "^16.3.0",
     "react-faux-dom": "^4.1.0",

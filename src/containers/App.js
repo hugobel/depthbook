@@ -1,11 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import api from '../services/api';
+import Pusher from 'pusher-js';
 import collection from '../utils/collection';
-import config from '../utils/config';
-
-import OptionGroup from '../components/OptionGroup';
 import DepthChart from '../components/DepthChart';
 import Table from '../components/Table';
 
@@ -18,55 +13,31 @@ class App extends React.Component {
     this.state = {
       asks: [],
       bids: [],
-      book: '',
-      query: this.props.book,
     };
-
-    this.requestBook = this.requestBook.bind(this);
   }
 
   componentDidMount() {
-    this.requestBook(this.props.book);
-  }
+    const pusher = new Pusher('de504dc5763aeef9ff52');
+    const orderBookChannel = pusher.subscribe('order_book');
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.state.book !== nextState.book || nextState.query;
-  }
-
-  componentDidUpdate() {
-    if (this.state.query) this.requestBook(this.state.query);
-  }
-
-  requestBook(book) {
-    api
-      .getOrderBook(book)
-      .then(response => response.data.payload)
-      .then(data => ({
+    orderBookChannel.bind('data', (data) => {
+      this.setState({
         asks: collection.appendCumulative(data.asks),
         bids: collection.appendCumulative(data.bids),
-      }))
-      .then(data => this.setState({
-        book,
-        ...data,
-        query: null,
-      }));
+      });
+    });
   }
 
   render() {
-    const { asks, bids, book } = this.state;
-    const navParams = {
-      options: config.BOOKS,
-      current: book,
-      onChange: this.requestBook,
-    };
+    const { asks, bids } = this.state;
 
     return (
       <div className="container">
-        <section className="row justify-content-center mt-5 mb-5">
-          { hasOrders({ asks, bids }) && <DepthChart orders={{ asks, bids }} /> }
+        <section className="row justify-content-center mt-5 mb-2">
+          <h3>Depth Chart (USD/BTC)</h3>
         </section>
-        <section className="row justify-content-center mt-5 mb-5">
-          <OptionGroup {...navParams} />
+        <section className="row justify-content-center mt-2 mb-5">
+          { hasOrders({ asks, bids }) && <DepthChart orders={{ asks, bids }} /> }
         </section>
         <div className="row justify-content-around small">
           <Table label="Posturas de compra" orders={bids} type="bids" />
@@ -76,13 +47,5 @@ class App extends React.Component {
     );
   }
 }
-
-App.defaultProps = {
-  book: 'btc_mxn',
-};
-
-App.propTypes = {
-  book: PropTypes.string,
-};
 
 export default App;
