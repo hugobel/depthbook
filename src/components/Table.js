@@ -33,11 +33,13 @@ const TableRow = order => (
   </tr>
 );
 
-const Table = ({ label, orders }) => (
-  <section className="col-5">
-    <table className="table table-sm">
+const Table = ({ label, orders, type }) => (
+  <section className="col-6">
+    <table className="table">
       <thead>
-        <tr><th colSpan="4">{ label }</th></tr>
+        <tr className={`table-header table-header--${type}`}>
+          <th colSpan="4">{ label }</th>
+        </tr>
       </thead>
       <TableDefinitions />
       <tbody>
@@ -50,10 +52,12 @@ const Table = ({ label, orders }) => (
 Table.propTypes = {
   label: PropTypes.string.isRequired,
   orders: PropTypes.arrayOf(PropTypes.object),
+  type: PropTypes.string,
 };
 
 Table.defaultProps = {
   orders: [],
+  type: '',
 };
 
 export default Table;

@@ -208,6 +208,8 @@ class Chart {
   update(orders) {
     this.orders = orders;
 
+    d3.selectAll('*').interrupt();
+
     this.setLimits();
     this.setScales();
     this.setGraphicLimit();

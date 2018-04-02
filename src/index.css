@@ -4,12 +4,26 @@ body.depthbook {
   background: #e9e9e9;
 }
 
-.chart {
+.chart,
+.depthbook .table {
   background: #fff;
   border: 1px solid #d3d3d3;
   box-shadow: 0 1px 1px rgba(0,0,0,.05);
   border-radius: 3px;
+  font-size: 1.2em;
 }
+
+.depthbook .table th,
+.depthbook .table td {
+  padding: 3px 20px;
+}
+
+.table-header {
+  font-size: 1.5em;
+}
+
+.table-header--asks { background: rgba(158, 158, 158, 0.75) }
+.table-header--bids { background: rgba(37, 155, 36, 0.75) }
 
 .chart-area--asks { fill: rgba(158, 158, 158, 0.5) }
 .chart-area--bids { fill: rgba(37, 155, 36, 0.5) }

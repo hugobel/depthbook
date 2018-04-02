@@ -3,10 +3,13 @@ import PropTypes from 'prop-types';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import api from '../services/api';
 import collection from '../utils/collection';
-import Table from '../components/Table';
-import DepthChart from '../components/DepthChart';
+import config from '../utils/config';
 
-const hasOrders = o => o.asks.length || o.bids.length;
+import OptionGroup from '../components/OptionGroup';
+import DepthChart from '../components/DepthChart';
+import Table from '../components/Table';
+
+const hasOrders = o => o.asks.length > 0 || o.bids.length > 0;
 
 class App extends React.Component {
   constructor(props) {
@@ -24,14 +27,6 @@ class App extends React.Component {
 
   componentDidMount() {
     this.requestBook(this.props.book);
-
-    setTimeout(() => {
-      this.setState({ query: 'btc_mxn' });
-    }, 5000);
-
-    setTimeout(() => {
-      this.setState({ query: 'eth_mxn' });
-    }, 10000);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -58,16 +53,24 @@ class App extends React.Component {
   }
 
   render() {
-    const { asks, bids } = this.state;
+    const { asks, bids, book } = this.state;
+    const navParams = {
+      options: config.BOOKS,
+      current: book,
+      onChange: this.requestBook,
+    };
 
     return (
       <div className="container">
         <section className="row justify-content-center mt-5 mb-5">
           { hasOrders({ asks, bids }) && <DepthChart orders={{ asks, bids }} /> }
         </section>
+        <section className="row justify-content-center mt-5 mb-5">
+          <OptionGroup {...navParams} />
+        </section>
         <div className="row justify-content-around small">
-          <Table label="Posturas de compra" orders={bids} />
-          <Table label="Posturas de venta" orders={asks} />
+          <Table label="Posturas de compra" orders={bids} type="bids" />
+          <Table label="Posturas de venta" orders={asks} type="asks" />
         </div>
       </div>
     );
