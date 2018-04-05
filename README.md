@@ -1,6 +1,7 @@
 # Depthbook
 
 Depth Chart for Bitcoin orders book.
+[Demo](https://hugobel.github.io/depthbook/)
 
 ## Features
 
